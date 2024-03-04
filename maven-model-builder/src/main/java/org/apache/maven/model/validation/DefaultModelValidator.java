@@ -611,6 +611,7 @@ public class DefaultModelValidator implements ModelValidator {
         for (Repository externalRepository : externalRepositories) {
             Optional<Repository> clashingPomRepository = pomRepositories.stream()
                     .filter(r -> Objects.equals(r.getId(), externalRepository.getId()))
+                    .filter(r -> !Objects.equals(r.getUrl(), externalRepository.getUrl()))
                     .findFirst();
             if (clashingPomRepository.isPresent()) {
                 addViolation(
@@ -619,7 +620,8 @@ public class DefaultModelValidator implements ModelValidator {
                         Version.BASE,
                         isPluginRepository ? "pluginRepositories.repository" : "repositories.repository",
                         clashingPomRepository.get().getId(),
-                        "is overwritten by the repository with same id from " + externalRepositoriesSource,
+                        "is overwritten by the repository with same id but having a different url from "
+                                + externalRepositoriesSource,
                         clashingPomRepository.get());
             }
         }
